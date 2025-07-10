@@ -32,5 +32,4 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(i => i.ContainerId)
             .OnDelete(DeleteBehavior.Restrict); // 🌸 Burası hayatımızı kurtaracak
     }
-    
 }
