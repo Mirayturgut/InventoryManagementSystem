@@ -1,10 +1,11 @@
-﻿using InventoryManagementSystem.Data;
+﻿using System.Security.Claims;
+using InventoryManagementSystem.Data;
 using InventoryManagementSystem.Models.DTO_s.Item;
 using InventoryManagementSystem.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace InventoryManagementSystem.Controller;
+namespace InventoryManagementSystem.Controllers;
 
 [ApiController]
 [Route("/item")]
@@ -34,7 +35,7 @@ public class ItemController(AppDbContext context) : ControllerBase
     [HttpGet("search")]
     [ProducesResponseType(typeof(ItemDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Search([FromQuery] string query)
+    public IActionResult Search([FromQuery] string query) // KEY = query => VALUE = (ARADIĞIN ŞEY)
     {
         if (string.IsNullOrWhiteSpace(query))
             return BadRequest("Arama metni boş olamaz.");
@@ -51,6 +52,7 @@ public class ItemController(AppDbContext context) : ControllerBase
         {
             Name = item.Name,
             Quantity = item.Quantity,
+            ExpiryDate = item.ExpiryDate,
             ContainerName = item.Container?.Name
 
         }).ToList();
@@ -59,7 +61,7 @@ public class ItemController(AppDbContext context) : ControllerBase
         
     }
     
-    [HttpGet("expired")]
+    [HttpGet("expired")] // SÜRESİ GEÇMİŞ ÜRÜNLER
     [ProducesResponseType(typeof(ItemDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetExpiredItems()
@@ -82,7 +84,7 @@ public class ItemController(AppDbContext context) : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("expiring-soon")]
+    [HttpGet("expiring-soon")] // 7 GÜN İÇİNDE BOZULACAK ÜRÜNLER 
     public IActionResult GetExpiringSoonItems()
     {
         var today = DateTime.Today;
@@ -98,14 +100,14 @@ public class ItemController(AppDbContext context) : ControllerBase
             Name = item.Name,
             Quantity = item.Quantity,
             ContainerName = item.Container?.Name,
-            ExpiryDate = item.ExpiryDate
+            ExpiryDate = item.ExpiryDate //"expiryDate": "2025-07-15T00:00:00"
         }).ToList();
 
         return Ok(result);
     }
 
     
-    [HttpGet("with-expiry")]
+    [HttpGet("with-expiry")] // SON KULLANMA TARİHİ OLAN TÜM ÜRÜNLER
     [ProducesResponseType(typeof(ItemDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetItemsWithExpiry()
@@ -132,16 +134,21 @@ public class ItemController(AppDbContext context) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Create(ItemCreateDto dto)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) return Unauthorized();
+        
         var container = context.Containers.Find(dto.ContainerId);
         if (container == null)
-            return BadRequest("ContainerId geçersiz.");
+            return NotFound(new { message = $"Id {dto.ContainerId} ile eşleşen container bulunamadı." });
     
         var item = new Item
         {
             Name = dto.Name,
             Quantity = dto.Quantity,
             ContainerId = dto.ContainerId,
-            Created = dto.Created
+            Created = DateTime.Now,
+            ExpiryDate = dto.ExpiryDate,
+            UserId = userId
         };
     
         context.Items.Add(item);
@@ -150,7 +157,7 @@ public class ItemController(AppDbContext context) : ControllerBase
         return CreatedAtAction(nameof(Get), null);
     }
     
-    [HttpPut("{id}/container")]
+    [HttpPut("{id}/container")] //İTEMIN CONTAİNERINI GÜNCELLEME {İD} KISMINA İTEM ID Sİ GİRECEKSİN
     public IActionResult AssignContainer(int id, ItemAssignContainerDto dto)
     {
         var item = context.Items.Find(id);

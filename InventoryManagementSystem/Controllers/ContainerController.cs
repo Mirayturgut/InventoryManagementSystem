@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using InventoryManagementSystem.Data;
 using InventoryManagementSystem.Models.DTO_s.Container;
 using InventoryManagementSystem.Models.Entities;
@@ -29,10 +30,17 @@ public class ContainerController( AppDbContext _context, UserManager<IdentityUse
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult CreateContainer([FromBody] ContainerCreateDto dto)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized("Giriş yapılmamış.");
+        }
+      
         var container = new Container
         {
             Name = dto.Name,
             LocationId = dto.LocationId,
+            UserId = userId
         };
         _context.Containers.Add(container);
         _context.SaveChanges();
@@ -51,6 +59,7 @@ public class ContainerController( AppDbContext _context, UserManager<IdentityUse
         container.Name = dto.Name;
         container.LocationId = dto.LocationId;
         container.Updated = DateTime.Now;
+        
         _context.Containers.Update(container);
         _context.SaveChanges();
         return Ok(container);

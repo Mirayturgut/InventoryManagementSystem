@@ -76,8 +76,8 @@ public class UserController( AppDbContext _context, UserManager<IdentityUser> us
         var email = Email
             .From("mesaj@bilgi.codemydata.com.tr","Miray Turgut")
             .To(userEmail)
-            .Subject("Min Blog")
-            .Body($"Mini Blog'a Hoşgeldiniz {User.Identity.Name}.")
+            .Subject("Envanter Yönetim Sistemi")
+            .Body($"Envanter Yönetim Sistemi'ne Hoşgeldiniz {User.Identity.Name}.")
             .Send();
         return Ok(userEmail);
     }
