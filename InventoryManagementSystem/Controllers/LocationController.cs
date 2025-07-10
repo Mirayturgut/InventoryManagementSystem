@@ -1,6 +1,7 @@
 using InventoryManagementSystem.Data;
 using InventoryManagementSystem.Models.DTO_s.Container;
 using InventoryManagementSystem.Models.DTO_s.Location;
+using InventoryManagementSystem.Models.DTOs.Container;
 using InventoryManagementSystem.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
