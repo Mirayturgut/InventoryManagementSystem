@@ -1,4 +1,4 @@
-namespace InventoryManagementSystem.Models.DTO_s.Container;
+namespace InventoryManagementSystem.Models.DTOs.Container;
 
 public class ContainerDto
 {

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Data;
 
+
 public class AppDbContext : IdentityDbContext<IdentityUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
