@@ -8,6 +8,5 @@ public class ItemCreateDto
     
     public DateTime? ExpiryDate { get; set; }   
     
-    public DateTime Created { get; set; } = DateTime.Now;
     
 }

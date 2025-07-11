@@ -3,13 +3,15 @@ using InventoryManagementSystem.Models.DTO_s.Container;
 using InventoryManagementSystem.Models.DTO_s.Location;
 using InventoryManagementSystem.Models.DTOs.Container;
 using InventoryManagementSystem.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Controllers;
 [ApiController]
-[Route("/location")]
+[Route("[controller]")]
+[Authorize]
 public class LocationController( AppDbContext _context, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpGet("{id}")]
@@ -17,6 +19,8 @@ public class LocationController( AppDbContext _context, UserManager<IdentityUser
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetLocation(int id)
     {
+        var userId = userManager.GetUserId(User);
+        // ... Idli kişinin location'ı
         var location = _context.Locations.Include(c => c.Containers)
             .FirstOrDefault(l => l.Id == id);
         if (location == null)

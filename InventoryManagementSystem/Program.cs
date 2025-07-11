@@ -11,6 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
@@ -29,20 +41,19 @@ builder.Services
         EnableSsl = true,
         Credentials = new NetworkCredential(smtpSettings.Username, smtpSettings.Password),
     });
+
 var app = builder.Build();
 
+app.UseCors("AllowFrontend");
 
 app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapControllers();
 
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-
 app.UseAuthorization();
-
-app.MapControllers();
 
 app.MapGroup("Auth").MapIdentityApi<IdentityUser>().WithTags("Auth");
 

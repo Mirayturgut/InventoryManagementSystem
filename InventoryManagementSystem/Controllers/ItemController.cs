@@ -2,14 +2,17 @@
 using InventoryManagementSystem.Data;
 using InventoryManagementSystem.Models.DTO_s.Item;
 using InventoryManagementSystem.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Controllers;
 
 [ApiController]
-[Route("/item")]
-public class ItemController(AppDbContext context) : ControllerBase
+[Route("[controller]")]
+[Authorize]
+public class ItemController(AppDbContext context, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType<ItemDto[]>(StatusCodes.Status200OK)]
@@ -146,7 +149,6 @@ public class ItemController(AppDbContext context) : ControllerBase
             Name = dto.Name,
             Quantity = dto.Quantity,
             ContainerId = dto.ContainerId,
-            Created = DateTime.Now,
             ExpiryDate = dto.ExpiryDate,
             UserId = userId
         };

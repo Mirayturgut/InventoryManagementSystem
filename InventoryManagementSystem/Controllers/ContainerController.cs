@@ -2,13 +2,15 @@ using System.Security.Claims;
 using InventoryManagementSystem.Data;
 using InventoryManagementSystem.Models.DTO_s.Container;
 using InventoryManagementSystem.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementSystem.Controllers;
 [ApiController]
-[Route("/container")]
+[Route("[controller]")]
+[Authorize]
 public class ContainerController( AppDbContext _context, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpGet("{id}/items")]
@@ -25,7 +27,7 @@ public class ContainerController( AppDbContext _context, UserManager<IdentityUse
         return Ok(container);
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult CreateContainer([FromBody] ContainerCreateDto dto)
@@ -47,7 +49,7 @@ public class ContainerController( AppDbContext _context, UserManager<IdentityUse
         return Ok(container);
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult UpdateContainer([FromBody] ContainerUpdateDto dto)
